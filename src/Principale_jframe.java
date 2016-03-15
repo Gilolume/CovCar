@@ -20,6 +20,7 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -193,7 +194,8 @@ public class Principale_jframe extends JFrame {
 					Principale_jframe frame = new Principale_jframe();
 					frame.setLocationRelativeTo(null);
 					frame.setVisible(true);
-					
+					frame.txt_pseudo.setText("ggierak");
+					frame.pass_mdp.setText("garde");
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -416,10 +418,24 @@ public class Principale_jframe extends JFrame {
 		panel_consulter_covoiturage.add(btnChercherUnCovoiturage);
 		
 		table_afficher_consult_cov = new JTable();
+		table_afficher_consult_cov.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent evt) {
+				if (evt.getClickCount() == 2){
+					int row = table_afficher_consult_cov.getSelectedRow();
+					Inscription_covoiturage((Integer) table_afficher_consult_cov.getModel().getValueAt(row, 0), Principale_jframe.utilisateur_conn_num);
+				}	
+			}
+		});
 		table_afficher_consult_cov.setBorder(new LineBorder(new Color(0, 0, 0)));
 		table_afficher_consult_cov.setModel(model_table_afficher_cov);
 		table_afficher_consult_cov.setBounds(10, 156, 804, 155);
 		panel_consulter_covoiturage.add(table_afficher_consult_cov);
+		
+		JLabel lblNewLabel_13 = new JLabel("(Double clic pour s'inscrire \u00E0 un covoiturage)");
+		lblNewLabel_13.setFont(new Font("Tahoma", Font.ITALIC, 11));
+		lblNewLabel_13.setBounds(10, 322, 270, 14);
+		panel_consulter_covoiturage.add(lblNewLabel_13);
 		panel_consulter_covoiturage.setVisible(false);
 		
 		panel_mes_covoiturage = new JPanel();
@@ -2302,7 +2318,7 @@ public class Principale_jframe extends JFrame {
 				String sql_ajouter_cov = "INSERT INTO covoiturages VALUES (NULL, '"+utilisateur_conn_num+"','"+Recuperer_numero_vehicule_choisis()+"','"+txt_cp_ville_depart_ajouter_cov.getText()+"','"
 				+txt_cp_ville_arriver_ajouter_cov.getText()+"','"+txt_date_ajouter_cov.getText()+"','"+(float) spinner_distance_ajouter_cov.getValue()+"','"
 				+(int) spinner_nb_place_ajouter_cov.getValue()+"','"+(float) spinner_prix_ajouter_cov.getValue()+"')";
-				pst = conn.prepareStatement(sql_ajouter_cov);
+				pst = conn.prepareStatement(sql_ajouter_cov, Statement.RETURN_GENERATED_KEYS);
 				 
 				//pst.setInt(1, (Integer) null);
 				/*pst.setInt(1,utilisateur_conn_num);
@@ -2331,16 +2347,52 @@ public class Principale_jframe extends JFrame {
 				*/
 				
 				pst.executeUpdate();
+				ResultSet rs = pst.getGeneratedKeys();
+				rs.next();
+				int cle_primaire_gen = rs.getInt(1);
+					
+				
 				
 				JOptionPane.showMessageDialog(null, "Covoiturage ajouté avec succès");
 				
 				//Ajouter celui qui à fait le covoiturage dans la table des participants ----------------------------------------------------------------------------------------------
-				 
+				try{
+					String sql_recup_dne_perso = "SELECT nom, prenom, mail FROM utilisateurs WHERE num_utilisateur = ?";
+					pst = conn.prepareStatement(sql_recup_dne_perso);
+					pst.setInt(1,Principale_jframe.utilisateur_conn_num);
+					rs=pst.executeQuery();
+					if (rs.next()){
+						String nom = rs.getString("nom");
+						String prenom = rs.getString("prenom");
+						String mail = rs.getString("mail");
+						try{
+							String sql_insert_participant = "INSERT INTO participant VALUES (?, ?, ?, ?, ?, ?);";
+							pst = conn.prepareStatement(sql_insert_participant);
+							pst.setInt(1, cle_primaire_gen);
+							pst.setInt(2, Principale_jframe.utilisateur_conn_num);
+							pst.setString(3, nom);
+							pst.setString(4, prenom);
+							pst.setString(5, mail);
+							pst.setBoolean(6, true);
+							
+							pst.executeUpdate();
+						}
+						catch(Exception e){
+							JOptionPane.showMessageDialog(null, e);
+						}
+					}
+					else{
+						JOptionPane.showMessageDialog(null, "Une erreur est survenue !");
+					}
+				}
+				catch(Exception e){
+		            JOptionPane.showMessageDialog(null, e);
+		        }
 				
 			}
 			catch(SQLException e){
-				e.printStackTrace();
-				//JOptionPane.showMessageDialog(null, e);
+				//e.printStackTrace();
+				JOptionPane.showMessageDialog(null, e);
 			}
 		}
 	}
@@ -2397,16 +2449,23 @@ public class Principale_jframe extends JFrame {
 		model_table_afficher_cov.addColumn("Prix");
 		table_afficher_consult_cov.setModel(model_table_afficher_cov);
 		try{
-			String sql_recherche_covoiturage = ("SELECT * FROM covoiturages WHERE cp_ville_depart = ? AND cp_ville_arriver = ?");
+			String sql_recherche_covoiturage = ("SELECT * FROM covoiturages WHERE cp_ville_depart = ? AND cp_ville_arriver = ? AND nb_place > 0");
 			pst = conn.prepareStatement(sql_recherche_covoiturage);
 			pst.setString(1,txt_cp_ville_depart_consult_cov.getText());
 			pst.setString(2,txt_cp_ville_arriver_consult_cov.getText());
 			
 			rs=pst.executeQuery();
-            while(rs.next()){
-            	model_table_afficher_cov.addRow(new Object[] {rs.getInt("num_covoiturage"), rs.getString("cp_ville_depart"), rs.getString("cp_ville_arriver"),
-            			rs.getDate("date"), rs.getFloat("distance"), rs.getInt("nb_place"), rs.getFloat("prix")});
-            }
+			
+			boolean result = false;
+			while(rs.next()){
+				result = true;
+	        	model_table_afficher_cov.addRow(new Object[] {rs.getInt("num_covoiturage"), rs.getString("cp_ville_depart"), rs.getString("cp_ville_arriver"),
+	        			rs.getDate("date"), rs.getFloat("distance"), rs.getInt("nb_place"), rs.getFloat("prix")});
+	        	
+	        }
+			if (result == false){
+				JOptionPane.showMessageDialog(null, "Aucun résultat");
+			}
 		}
 		catch(Exception e){
 			JOptionPane.showMessageDialog(null, e);
@@ -2414,14 +2473,69 @@ public class Principale_jframe extends JFrame {
 		table_afficher_consult_cov.setModel(model_table_afficher_cov);
 	}
 	
-	//Permet de rajouter un participant à un covoiturage mis en parametre-------------------------------------------------------------
+	//Permet de rajouter un participant champ accepter à 1 à un covoiturage mis en parametre-------------------------------------------------------------
 	public void Ajouter_participant_covoiturage(int unNumCovoiturage, int unNumUtilisateur){
 		
 	}
 	
 	
-	//Permet de s'inscrire à un covoiturage (si il reste des places et si on est pas déjà inscri au covoiturage concerné-------------------------------------------------------
-	public void Inscription_covoiturage(){
+	//Permet de s'inscrire à un covoiturage table participant champ accepter à 0(si il reste des places et si on est pas déjà inscri au covoiturage concerné)-----------------------
+	public void Inscription_covoiturage(int unNumCovoiturage, int unNumUtilisateur){
+		try{
+			String sql_test_inscri = "SELECT num_covoiturage, num_utilisateur FROM participant WHERE num_covoiturage = ? AND num_utilisateur = ?";
+			pst = conn.prepareStatement(sql_test_inscri);
+			pst.setInt(1,unNumCovoiturage);
+			pst.setInt(2,unNumUtilisateur);
+			rs=pst.executeQuery();
+			if (!rs.next()){
+				try{
+					String sql_recup_dne_perso = "SELECT nom, prenom, mail FROM utilisateurs WHERE num_utilisateur = ?";
+					pst = conn.prepareStatement(sql_recup_dne_perso);
+					pst.setInt(1,unNumUtilisateur);
+					rs=pst.executeQuery();
+					if (rs.next()){
+						String nom = rs.getString("nom");
+						String prenom = rs.getString("prenom");
+						String mail = rs.getString("mail");
+						try{
+							String sql_insert_participant = "INSERT INTO participant VALUES (?, ?, ?, ?, ?, ?);";
+							pst = conn.prepareStatement(sql_insert_participant);
+							pst.setInt(1,unNumCovoiturage);
+							pst.setInt(2, unNumUtilisateur);
+							pst.setString(3, nom);
+							pst.setString(4, prenom);
+							pst.setString(5, mail);
+							pst.setBoolean(6, false);
+							
+							pst.executeUpdate();
+							JOptionPane.showMessageDialog(null, "Succès");
+							//Après l'inscription on retire une place disponible du coivoiturage avec l'appel de cette fonction
+							Retirer_place_disponible(unNumCovoiturage);
+						}
+						catch(Exception e){
+							JOptionPane.showMessageDialog(null, e);
+						}
+					}
+					else{
+						JOptionPane.showMessageDialog(null, "Une erreur est survenue !");
+					}
+				}
+				catch(Exception e){
+		            JOptionPane.showMessageDialog(null, e);
+		        }
+			}
+			else{
+				JOptionPane.showMessageDialog(null, "Vous êtes déjà inscrit à ce covoiturage");
+			}
+			
+		}
+		catch(Exception e){
+            JOptionPane.showMessageDialog(null, e);
+        }
+	}
+	
+	//On retire une place disponible quand un utilisateur s'inscri à un covoiturage
+	public void Retirer_place_disponible(int unNumCovoiturage){
 		
 	}
 }
