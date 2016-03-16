@@ -359,7 +359,7 @@ public class Principale_jframe extends JFrame {
 		table_ville_depart_consult_cov.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent evt) {
-				if (evt.getClickCount() == 2){
+				if (evt.getClickCount() == 2 && SwingUtilities.isLeftMouseButton(evt)){
 					Double_click_ville(table_ville_depart_consult_cov, txt_ville_depart_consult_cov, txt_cp_ville_depart_consult_cov);
 				}
 			}
@@ -373,7 +373,7 @@ public class Principale_jframe extends JFrame {
 		table_ville_arriver_consult_cov.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent evt) {
-				if (evt.getClickCount() == 2){
+				if (evt.getClickCount() == 2 && SwingUtilities.isLeftMouseButton(evt)){
 					Double_click_ville(table_ville_arriver_consult_cov, txt_ville_arriver_consult_cov, txt_cp_ville_arriver_consult_cov);
 				}
 			}
@@ -421,10 +421,15 @@ public class Principale_jframe extends JFrame {
 		table_afficher_consult_cov.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent evt) {
-				if (evt.getClickCount() == 2){
+				if (evt.getClickCount() == 2 && SwingUtilities.isLeftMouseButton(evt)){
 					int row = table_afficher_consult_cov.getSelectedRow();
+					System.out.println("double");
 					Inscription_covoiturage((Integer) table_afficher_consult_cov.getModel().getValueAt(row, 0), Principale_jframe.utilisateur_conn_num);
-				}	
+				}
+				else if (SwingUtilities.isLeftMouseButton(evt)){
+					System.out.println("simple");
+					//Afficher les information du conducteur sur le covoiturage sélectionné
+				}
 			}
 		});
 		table_afficher_consult_cov.setBorder(new LineBorder(new Color(0, 0, 0)));
@@ -545,7 +550,7 @@ public class Principale_jframe extends JFrame {
 		table_ville_depart_ajouter_cov.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent evt) {
-				if (evt.getClickCount() == 2){
+				if (evt.getClickCount() == 2 && SwingUtilities.isLeftMouseButton(evt)){
 					Double_click_ville(table_ville_depart_ajouter_cov, txt_ville_depart_ajouter_cov, txt_cp_ville_depart_ajouter_cov);
 				}
 			}
@@ -565,7 +570,7 @@ public class Principale_jframe extends JFrame {
 		table_ville_arriver_ajouter_cov.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent evt) {
-				if (evt.getClickCount() == 2){
+				if (evt.getClickCount() == 2 && SwingUtilities.isLeftMouseButton(evt)){
 					Double_click_ville(table_ville_arriver_ajouter_cov, txt_ville_arriver_ajouter_cov, txt_cp_ville_arriver_ajouter_cov);
 				}
 			}
@@ -2511,6 +2516,9 @@ public class Principale_jframe extends JFrame {
 							JOptionPane.showMessageDialog(null, "Succès");
 							//Après l'inscription on retire une place disponible du coivoiturage avec l'appel de cette fonction
 							Retirer_place_disponible(unNumCovoiturage);
+							model_table_afficher_cov.setRowCount(0);
+							table_afficher_consult_cov.setModel(model_table_afficher_cov);
+							
 						}
 						catch(Exception e){
 							JOptionPane.showMessageDialog(null, e);
@@ -2534,8 +2542,30 @@ public class Principale_jframe extends JFrame {
         }
 	}
 	
-	//On retire une place disponible quand un utilisateur s'inscri à un covoiturage
+	//On retire une place disponible quand un utilisateur s'inscri à un covoiturage--------------------------------------------------------------------------
 	public void Retirer_place_disponible(int unNumCovoiturage){
-		
+		try{
+			String sql_retire_place = "UPDATE covoiturages SET nb_place = nb_place-1 WHERE num_covoiturage = ?";
+			pst = conn.prepareStatement(sql_retire_place);
+			pst.setInt(1,unNumCovoiturage);
+			
+			pst.executeUpdate();
+		}
+		catch(Exception e){
+			JOptionPane.showMessageDialog(null, e);
+		}
+	}
+	//On ajoute une place disponible quand un utilisateur n'est pas accepté, qu'il se desinscri ou qu'il est virer du covoiturage----------------------------------------------------
+	public void Ajouter_place_disponible(int unNumCovoiturage){
+		try{
+			String sql_ajout_place = "UPDATE covoiturages SET nb_place = nb_place+1 WHERE num_covoiturage = ?";
+			pst = conn.prepareStatement(sql_ajout_place);
+			pst.setInt(1,unNumCovoiturage);
+			
+			pst.executeUpdate();
+		}
+		catch(Exception e){
+			JOptionPane.showMessageDialog(null, e);
+		}
 	}
 }
