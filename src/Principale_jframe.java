@@ -24,6 +24,9 @@ import java.sql.Statement;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.Month;
+import java.time.Period;
 
 import javax.swing.*;
 
@@ -45,6 +48,7 @@ import java.awt.event.InputMethodListener;
 import java.awt.event.InputMethodEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.SystemColor;
 
 
 public class Principale_jframe extends JFrame {
@@ -183,6 +187,7 @@ public class Principale_jframe extends JFrame {
     private JTextField txt_cp_ville_arriver_consult_cov;
     private JTextField txt_ville_arriver_consult_cov;
     private JTable table_afficher_consult_cov;
+    private JLabel lblInfoConducteur;
 
 	/**
 	 * Launch the application.
@@ -421,14 +426,13 @@ public class Principale_jframe extends JFrame {
 		table_afficher_consult_cov.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent evt) {
+				int row = table_afficher_consult_cov.getSelectedRow();
 				if (evt.getClickCount() == 2 && SwingUtilities.isLeftMouseButton(evt)){
-					int row = table_afficher_consult_cov.getSelectedRow();
-					System.out.println("double");
 					Inscription_covoiturage((Integer) table_afficher_consult_cov.getModel().getValueAt(row, 0), Principale_jframe.utilisateur_conn_num);
 				}
 				else if (SwingUtilities.isLeftMouseButton(evt)){
-					System.out.println("simple");
 					//Afficher les information du conducteur sur le covoiturage sélectionné
+					Afficher_information_conducteur((Integer) table_afficher_consult_cov.getModel().getValueAt(row, 0));
 				}
 			}
 		});
@@ -441,6 +445,12 @@ public class Principale_jframe extends JFrame {
 		lblNewLabel_13.setFont(new Font("Tahoma", Font.ITALIC, 11));
 		lblNewLabel_13.setBounds(10, 322, 270, 14);
 		panel_consulter_covoiturage.add(lblNewLabel_13);
+		
+		lblInfoConducteur = new JLabel("");
+		lblInfoConducteur.setForeground(Color.BLUE);
+		lblInfoConducteur.setBackground(Color.WHITE);
+		lblInfoConducteur.setBounds(327, 322, 487, 14);
+		panel_consulter_covoiturage.add(lblInfoConducteur);
 		panel_consulter_covoiturage.setVisible(false);
 		
 		panel_mes_covoiturage = new JPanel();
@@ -2540,6 +2550,45 @@ public class Principale_jframe extends JFrame {
 		catch(Exception e){
             JOptionPane.showMessageDialog(null, e);
         }
+	}
+	
+	//On affiche les informations du conducteur (créateur de covoiturage) séléctionné---------------------------------------------
+	public void Afficher_information_conducteur(int unNumCovoiturage){
+		try{
+			String sql_recup_num_utilisateur = "SELECT num_utilisateur FROM covoiturages WHERE num_covoiturage = ?";
+			pst = conn.prepareStatement(sql_recup_num_utilisateur);
+			pst.setInt(1, unNumCovoiturage);
+			rs=pst.executeQuery();
+			if (rs.next()){
+				int leNumUtilisateur = rs.getInt("num_utilisateur");
+				try{
+					String sql_info_utilisateur = "SELECT nom, prenom, date_naissance FROM utilisateurs WHERE num_utilisateur = ?";
+					pst = conn.prepareStatement(sql_info_utilisateur);
+					pst.setInt(1, leNumUtilisateur);
+					rs=pst.executeQuery();
+					if (rs.next()){
+						Date date = rs.getDate("date_naissance");
+						Calendar cal = Calendar.getInstance();
+					    cal.setTime(date);
+					    int year = cal.get(Calendar.YEAR);
+					    int month = cal.get(Calendar.MONTH);
+						int day = cal.get(Calendar.DAY_OF_MONTH);
+						LocalDate today = LocalDate.now();
+						LocalDate birthday = LocalDate.of(year, month, day);
+						Period p = Period.between(birthday, today);
+					    lblInfoConducteur.setText("Conducteur : " + rs.getString("nom") + " " + rs.getString("prenom") + " | Age : " + p.getYears());
+					}
+				}
+				catch(Exception e){
+					JOptionPane.showMessageDialog(null, e);
+				}
+			}
+		}
+		catch(Exception e){
+			JOptionPane.showMessageDialog(null, e);
+		}
+		
+		
 	}
 	
 	//On retire une place disponible quand un utilisateur s'inscri à un covoiturage--------------------------------------------------------------------------
