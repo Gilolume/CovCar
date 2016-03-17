@@ -182,6 +182,7 @@ public class Principale_jframe extends JFrame {
     MyTableModel model_table_arriver = new MyTableModel();
     MyTableModel model_table_afficher_cov = new MyTableModel();
     MyTableModel model_table_afficher_mes_cov_cree = new MyTableModel();
+    MyTableModel model_table_afficher_mes_cov_participant = new MyTableModel();
     private JTextField txt_ville_depart_consult_cov;
     private JTextField txt_cp_ville_depart_consult_cov;
     private JTable table_ville_depart_consult_cov;
@@ -192,6 +193,9 @@ public class Principale_jframe extends JFrame {
     private JLabel lblInfoConducteur;
     private JTable table_afficher_mes_cov_cree;
     private JButton btn_supprimer_mes_cov_cree;
+    private JTable table_afficher_mes_cov_participant;
+    private JButton btn_accepter_participant_cov;
+    private JButton btn_rejeter_participant_cov;
 
 	/**
 	 * Launch the application.
@@ -204,7 +208,7 @@ public class Principale_jframe extends JFrame {
 					frame.setLocationRelativeTo(null);
 					frame.setVisible(true);
 					frame.txt_pseudo.setText("ggierak");
-					frame.pass_mdp.setText("garde");
+					frame.pass_mdp.setText("admin");
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -340,6 +344,15 @@ public class Principale_jframe extends JFrame {
 		panel_mes_covoiturage.add(button_retour_mes_cov);
 		
 		table_afficher_mes_cov_cree = new JTable();
+		table_afficher_mes_cov_cree.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent evt) {
+				int row = table_afficher_mes_cov_cree.getSelectedRow();
+				if (row != -1 && SwingUtilities.isLeftMouseButton(evt)){
+					Afficher_participant_covoiturage((Integer) table_afficher_mes_cov_cree.getModel().getValueAt(row, 0));	
+				}
+			}
+		});
 		table_afficher_mes_cov_cree.setModel(new DefaultTableModel(
 			new Object[][] {
 				{},
@@ -350,7 +363,7 @@ public class Principale_jframe extends JFrame {
 		));
 
 		table_afficher_mes_cov_cree.setBorder(new LineBorder(new Color(0, 0, 0)));
-		table_afficher_mes_cov_cree.setBounds(10, 52, 391, 150);
+		table_afficher_mes_cov_cree.setBounds(10, 36, 391, 166);
 		panel_mes_covoiturage.add(table_afficher_mes_cov_cree);
 		
 		JSeparator separator = new JSeparator();
@@ -377,8 +390,51 @@ public class Principale_jframe extends JFrame {
 				}
 			}
 		});
-		btn_supprimer_mes_cov_cree.setBounds(273, 213, 128, 23);
+		btn_supprimer_mes_cov_cree.setBounds(286, 213, 115, 23);
 		panel_mes_covoiturage.add(btn_supprimer_mes_cov_cree);
+		
+		table_afficher_mes_cov_participant = new JTable();
+		table_afficher_mes_cov_participant.setBorder(new LineBorder(new Color(0, 0, 0)));
+		table_afficher_mes_cov_participant.setBounds(10, 272, 391, 86);
+		panel_mes_covoiturage.add(table_afficher_mes_cov_participant);
+		
+		JLabel lblNewLabel_15 = new JLabel("Participant \u00E0 ce covoiturage :");
+		lblNewLabel_15.setBounds(136, 247, 185, 14);
+		panel_mes_covoiturage.add(lblNewLabel_15);
+		
+		btn_accepter_participant_cov = new JButton("L'accepter");
+		btn_accepter_participant_cov.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				int row_covoiturage = table_afficher_mes_cov_cree.getSelectedRow();
+				int row_participant = table_afficher_mes_cov_participant.getSelectedRow();
+				if (row_participant == -1){
+					JOptionPane.showMessageDialog(null, "Aucun participant sélectionné !");
+				}
+				else{
+					Accepter_participant_covoiturage((Integer) table_afficher_mes_cov_cree.getModel().getValueAt(row_covoiturage, 0), ((Integer) table_afficher_mes_cov_participant.getModel().getValueAt(row_participant, 0)));
+				}
+			}
+		});
+		btn_accepter_participant_cov.setBounds(98, 369, 103, 23);
+		panel_mes_covoiturage.add(btn_accepter_participant_cov);
+		
+		btn_rejeter_participant_cov = new JButton("Le rejeter");
+		btn_rejeter_participant_cov.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				int row_covoiturage = table_afficher_mes_cov_cree.getSelectedRow();
+				int row_participant = table_afficher_mes_cov_participant.getSelectedRow();
+				if (row_participant == -1){
+					JOptionPane.showMessageDialog(null, "Aucun participant sélectionné !");
+				}
+				else{
+					Rejeter_participant_covoiturage((Integer) table_afficher_mes_cov_cree.getModel().getValueAt(row_covoiturage, 0), ((Integer) table_afficher_mes_cov_participant.getModel().getValueAt(row_participant, 0)));
+				}
+			}
+		});
+		btn_rejeter_participant_cov.setBounds(211, 369, 103, 23);
+		panel_mes_covoiturage.add(btn_rejeter_participant_cov);
 		panel_mes_covoiturage.setVisible(false);
 		
 		panel_ajouter_covoiturage = new JPanel();
@@ -2708,6 +2764,7 @@ public class Principale_jframe extends JFrame {
 		table_afficher_mes_cov_cree.setModel(model_table_afficher_mes_cov_cree);
 	}
 	
+	//Supprimer un covoiturage----------------------------------------------------------------------------------------------------------------------------------------------------
 	public void Supprimer_un_covoiturage(int unNumCovoiturage){
 		int option = JOptionPane.showConfirmDialog(null, "Voulez-vous supprimer le covoiturage n°"+unNumCovoiturage+" ?","Message de confirmation",JOptionPane.YES_NO_OPTION);
         if(option == JOptionPane.OK_OPTION){
@@ -2729,6 +2786,67 @@ public class Principale_jframe extends JFrame {
     			catch(Exception e){
     				JOptionPane.showMessageDialog(null, e);
     			}
+    		}
+    		catch(Exception e){
+    			JOptionPane.showMessageDialog(null, e);
+    		}
+        }
+	}
+	
+	//Afficher les participant du covoiturage selectionné par l'utilisateur-----------------------------------------------------------------------------
+	public void Afficher_participant_covoiturage(int unNumCovoiturage){
+		model_table_afficher_mes_cov_participant.setColumnCount(0);
+		model_table_afficher_mes_cov_participant.setRowCount(0);
+		model_table_afficher_mes_cov_participant.addColumn("Num utilisateur");
+		model_table_afficher_mes_cov_participant.addColumn("Nom");
+		model_table_afficher_mes_cov_participant.addColumn("Prenom");
+		model_table_afficher_mes_cov_participant.addColumn("Etat");
+		table_afficher_mes_cov_participant.setModel(model_table_afficher_mes_cov_participant);
+		try{
+			String sql_afficher_mescov_cree = ("SELECT num_utilisateur,nom,prenom,etat FROM participant WHERE num_covoiturage = ? AND etat != 'rejete'");
+			pst = conn.prepareStatement(sql_afficher_mescov_cree);
+			pst.setInt(1, unNumCovoiturage);
+			rs=pst.executeQuery();
+			while(rs.next()){
+				model_table_afficher_mes_cov_participant.addRow(new Object[] {rs.getInt("num_utilisateur"), rs.getString("nom"), rs.getString("prenom"), rs.getString("etat")});
+	        	
+	        }
+		}
+		catch(Exception e){
+			JOptionPane.showMessageDialog(null, e);
+		}
+		table_afficher_mes_cov_participant.setModel(model_table_afficher_mes_cov_participant);
+	}
+	
+	//Permet de mettre l'état d'un participant à un covoiturage à accepte--------------------------------------------------------------------------------------------------------
+	public void Accepter_participant_covoiturage(int unNumCovoiturage, int unNumUtilisateur){
+    	try{
+			String sql_accepter_participant = "UPDATE participant SET etat = 'accepte' WHERE num_covoiturage = ? AND num_utilisateur = ?";
+			pst = conn.prepareStatement(sql_accepter_participant);
+			pst.setInt(1,unNumCovoiturage);
+			pst.setInt(2, unNumUtilisateur);
+			
+			pst.executeUpdate();
+			Afficher_participant_covoiturage(unNumCovoiturage);
+		}
+		catch(Exception e){
+			JOptionPane.showMessageDialog(null, e);
+		}
+	}
+	
+	//Permet de mettre l'état d'un participant à un covoiturage à rejete et puis de rajouté + 1 au nombre de place disponible pour celui-ci---------------------------------------
+	public void Rejeter_participant_covoiturage(int unNumCovoiturage, int unNumUtilisateur){
+		int option = JOptionPane.showConfirmDialog(null, "Voulez-vous vraiment rejeter ce participant ?","Message de confirmation",JOptionPane.YES_NO_OPTION);
+        if(option == JOptionPane.OK_OPTION){
+        	try{
+    			String sql_rejete_participant = "UPDATE participant SET etat = 'rejete' WHERE num_covoiturage = ? AND num_utilisateur = ?";
+    			pst = conn.prepareStatement(sql_rejete_participant);
+    			pst.setInt(1,unNumCovoiturage);
+    			pst.setInt(2, unNumUtilisateur);
+    			
+    			pst.executeUpdate();
+    			Ajouter_place_disponible(unNumCovoiturage);
+    			Afficher_participant_covoiturage(unNumCovoiturage);
     		}
     		catch(Exception e){
     			JOptionPane.showMessageDialog(null, e);
