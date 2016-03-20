@@ -41,6 +41,9 @@ import javax.swing.border.LineBorder;
 import java.awt.Component;
 
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumnModel;
+
+import com.mysql.jdbc.PingTarget;
 
 import java.util.Calendar;
 import java.util.Vector;
@@ -183,6 +186,7 @@ public class Principale_jframe extends JFrame {
     MyTableModel model_table_afficher_cov = new MyTableModel();
     MyTableModel model_table_afficher_mes_cov_cree = new MyTableModel();
     MyTableModel model_table_afficher_mes_cov_participant = new MyTableModel();
+    MyTableModel model_table_afficher_mes_cov_inscritpion = new MyTableModel();
     private JTextField txt_ville_depart_consult_cov;
     private JTextField txt_cp_ville_depart_consult_cov;
     private JTable table_ville_depart_consult_cov;
@@ -196,6 +200,8 @@ public class Principale_jframe extends JFrame {
     private JTable table_afficher_mes_cov_participant;
     private JButton btn_accepter_participant_cov;
     private JButton btn_rejeter_participant_cov;
+    private JTable table_afficher_mes_cov_inscritpion;
+    private JButton btn_se_desinscrire_cov;
 
 	/**
 	 * Launch the application.
@@ -349,7 +355,7 @@ public class Principale_jframe extends JFrame {
 			public void mouseClicked(MouseEvent evt) {
 				int row = table_afficher_mes_cov_cree.getSelectedRow();
 				if (row != -1 && SwingUtilities.isLeftMouseButton(evt)){
-					Afficher_participant_covoiturage((Integer) table_afficher_mes_cov_cree.getModel().getValueAt(row, 0));	
+					Afficher_participant_covoiturage((Integer) table_afficher_mes_cov_cree.getModel().getValueAt(row, 0), Principale_jframe.utilisateur_conn_num);	
 				}
 			}
 		});
@@ -374,7 +380,7 @@ public class Principale_jframe extends JFrame {
 		panel_mes_covoiturage.add(separator);
 		
 		JLabel lblNewLabel_14 = new JLabel("Covoiturage cr\u00E9\u00E9 :");
-		lblNewLabel_14.setBounds(157, 11, 109, 14);
+		lblNewLabel_14.setBounds(157, 11, 142, 14);
 		panel_mes_covoiturage.add(lblNewLabel_14);
 		
 		btn_supprimer_mes_cov_cree = new JButton("Supprimer");
@@ -435,6 +441,31 @@ public class Principale_jframe extends JFrame {
 		});
 		btn_rejeter_participant_cov.setBounds(211, 369, 103, 23);
 		panel_mes_covoiturage.add(btn_rejeter_participant_cov);
+		
+		table_afficher_mes_cov_inscritpion = new JTable();
+		table_afficher_mes_cov_inscritpion.setBorder(new LineBorder(new Color(0, 0, 0)));
+		table_afficher_mes_cov_inscritpion.setBounds(422, 36, 392, 280);
+		panel_mes_covoiturage.add(table_afficher_mes_cov_inscritpion);
+		
+		JLabel lblNewLabel_16 = new JLabel("Covoiturage auxquelles je suis inscrit :");
+		lblNewLabel_16.setBounds(514, 11, 276, 14);
+		panel_mes_covoiturage.add(lblNewLabel_16);
+		
+		btn_se_desinscrire_cov = new JButton("Se d\u00E9sinscrire");
+		btn_se_desinscrire_cov.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				int row_covoiturage_inscri = table_afficher_mes_cov_inscritpion.getSelectedRow();
+				if (row_covoiturage_inscri == -1){
+					JOptionPane.showMessageDialog(null, "Aucun covoiturage sélectionné !");
+				}
+				else{
+					Se_desinscrire_covoiturage((Integer) table_afficher_mes_cov_inscritpion.getModel().getValueAt(row_covoiturage_inscri, 0),Principale_jframe.utilisateur_conn_num);
+				}
+			}
+		});
+		btn_se_desinscrire_cov.setBounds(556, 327, 128, 23);
+		panel_mes_covoiturage.add(btn_se_desinscrire_cov);
 		panel_mes_covoiturage.setVisible(false);
 		
 		panel_ajouter_covoiturage = new JPanel();
@@ -770,6 +801,7 @@ public class Principale_jframe extends JFrame {
 				button_consulter_covoiturage.setEnabled(false);
 				button_ajouter_covoiturage.setEnabled(false);
 				Afficher_mes_covoiturage_cree(Principale_jframe.utilisateur_conn_num);
+				Afficher_mes_coivoiture_inscrit(Principale_jframe.utilisateur_conn_num);
 			}
 		});
 		button_mes_covoiturage.setBounds(521, 11, 199, 23);
@@ -1882,6 +1914,22 @@ public class Principale_jframe extends JFrame {
 	             e.printStackTrace();
 	        }  
 	        return dateStr;
+	 }
+	//Convertire date : dd-mm-yyyy en format yyyy_mm_dd -----------------------------------------------------------------------------------------------
+	 public final String Date_Francais_Anglais(String date_en_francais){
+	        String dateStr = date_en_francais;
+	        try{
+	        DateFormat srcDf = new SimpleDateFormat("dd-MM-yyyy");
+	        java.util.Date date = srcDf.parse(dateStr);
+	        
+	        DateFormat destDf = new SimpleDateFormat("yyyy-MM-dd");
+	        dateStr = destDf.format(date);
+	        
+	        }
+	        catch (ParseException e) {
+	             e.printStackTrace();
+	        }  
+	        return dateStr;
 	    }
 	
 	
@@ -2389,13 +2437,14 @@ public class Principale_jframe extends JFrame {
 		try{
 			combo_vehicule_ajouter_cov.removeAllItems();
 			
-			String sql = "SELECT num_vehicule,num_utilisateur,num_vehicule_utilisateur,marque,modele FROM vehicules WHERE num_utilisateur = ? AND num_vehicule_utilisateur = ? "
-					+ "OR num_vehicule_utilisateur = ? OR num_vehicule_utilisateur = ?";
+			/*String sql = "SELECT num_vehicule,num_utilisateur,num_vehicule_utilisateur,marque,modele FROM vehicules WHERE num_utilisateur = ? AND num_vehicule_utilisateur = ? "
+					+ "OR num_vehicule_utilisateur = ? OR num_vehicule_utilisateur = ?";*/
+			String sql = "SELECT num_vehicule,num_utilisateur,num_vehicule_utilisateur,marque,modele FROM vehicules WHERE num_utilisateur = ?";
 			pst = conn.prepareStatement(sql);
-			pst.setInt(1,utilisateur_conn_num);
-			pst.setInt(2,1);
+			pst.setInt(1,Principale_jframe.utilisateur_conn_num);
+			/*pst.setInt(2,1);
 			pst.setInt(3,2);
-			pst.setInt(4,3);
+			pst.setInt(4,3);*/
 			
 			rs=pst.executeQuery();
 			
@@ -2408,7 +2457,7 @@ public class Principale_jframe extends JFrame {
         }
 	}
 	
-	//Recuperer le numero du vehicule choisis dans la comboBox fous ajouter un covoiturage -----------------------------------------------------------------------
+	//Recuperer le numero du vehicule choisis dans la comboBox pour ajouter un covoiturage -----------------------------------------------------------------------
 	public int Recuperer_numero_vehicule_choisis(){
 		try{
 			String sql = "SELECT num_vehicule,modele FROM vehicules WHERE num_utilisateur = ? AND modele = ?";
@@ -2450,7 +2499,7 @@ public class Principale_jframe extends JFrame {
 			try{
 				//String sql_ajouter_cov = "INSERT INTO covoiturages VALUES (null,?,?,?,?,?,?,?,?)";
 				String sql_ajouter_cov = "INSERT INTO covoiturages VALUES (NULL, '"+utilisateur_conn_num+"','"+Recuperer_numero_vehicule_choisis()+"','"+txt_cp_ville_depart_ajouter_cov.getText()+"','"
-				+txt_cp_ville_arriver_ajouter_cov.getText()+"','"+txt_date_ajouter_cov.getText()+"','"+(float) spinner_distance_ajouter_cov.getValue()+"','"
+				+txt_cp_ville_arriver_ajouter_cov.getText()+"','"+Date_Francais_Anglais(txt_date_ajouter_cov.getText())+"','"+(float) spinner_distance_ajouter_cov.getValue()+"','"
 				+(int) spinner_nb_place_ajouter_cov.getValue()+"','"+(float) spinner_prix_ajouter_cov.getValue()+"')";
 				pst = conn.prepareStatement(sql_ajouter_cov, Statement.RETURN_GENERATED_KEYS);
 				 
@@ -2747,6 +2796,9 @@ public class Principale_jframe extends JFrame {
 		model_table_afficher_mes_cov_cree.addColumn("Date");
 		model_table_afficher_mes_cov_cree.addColumn("Nombre places");
 		table_afficher_mes_cov_cree.setModel(model_table_afficher_mes_cov_cree);
+		TableColumnModel tcm = table_afficher_mes_cov_cree.getColumnModel();
+		tcm.getColumn(0).setPreferredWidth(5);   
+		
 		try{
 			String sql_afficher_mescov_cree = ("SELECT * FROM covoiturages WHERE num_utilisateur = ?");
 			pst = conn.prepareStatement(sql_afficher_mescov_cree);
@@ -2794,7 +2846,7 @@ public class Principale_jframe extends JFrame {
 	}
 	
 	//Afficher les participant du covoiturage selectionné par l'utilisateur-----------------------------------------------------------------------------
-	public void Afficher_participant_covoiturage(int unNumCovoiturage){
+	public void Afficher_participant_covoiturage(int unNumCovoiturage, int unNumUtilisateur){
 		model_table_afficher_mes_cov_participant.setColumnCount(0);
 		model_table_afficher_mes_cov_participant.setRowCount(0);
 		model_table_afficher_mes_cov_participant.addColumn("Num utilisateur");
@@ -2802,10 +2854,13 @@ public class Principale_jframe extends JFrame {
 		model_table_afficher_mes_cov_participant.addColumn("Prenom");
 		model_table_afficher_mes_cov_participant.addColumn("Etat");
 		table_afficher_mes_cov_participant.setModel(model_table_afficher_mes_cov_participant);
+		TableColumnModel tcm = table_afficher_mes_cov_participant.getColumnModel();
+		tcm.getColumn(0).setPreferredWidth(5);   
 		try{
-			String sql_afficher_mescov_cree = ("SELECT num_utilisateur,nom,prenom,etat FROM participant WHERE num_covoiturage = ? AND etat != 'rejete'");
+			String sql_afficher_mescov_cree = ("SELECT num_utilisateur,nom,prenom,etat FROM participant WHERE num_covoiturage = ? AND etat != 'rejete' AND num_utilisateur != ?");
 			pst = conn.prepareStatement(sql_afficher_mescov_cree);
 			pst.setInt(1, unNumCovoiturage);
+			pst.setInt(2, unNumUtilisateur);
 			rs=pst.executeQuery();
 			while(rs.next()){
 				model_table_afficher_mes_cov_participant.addRow(new Object[] {rs.getInt("num_utilisateur"), rs.getString("nom"), rs.getString("prenom"), rs.getString("etat")});
@@ -2827,7 +2882,7 @@ public class Principale_jframe extends JFrame {
 			pst.setInt(2, unNumUtilisateur);
 			
 			pst.executeUpdate();
-			Afficher_participant_covoiturage(unNumCovoiturage);
+			Afficher_participant_covoiturage(unNumCovoiturage, Principale_jframe.utilisateur_conn_num);
 		}
 		catch(Exception e){
 			JOptionPane.showMessageDialog(null, e);
@@ -2846,7 +2901,60 @@ public class Principale_jframe extends JFrame {
     			
     			pst.executeUpdate();
     			Ajouter_place_disponible(unNumCovoiturage);
-    			Afficher_participant_covoiturage(unNumCovoiturage);
+    			Afficher_participant_covoiturage(unNumCovoiturage, Principale_jframe.utilisateur_conn_num);
+    			Afficher_mes_covoiturage_cree(Principale_jframe.utilisateur_conn_num);
+    		}
+    		catch(Exception e){
+    			JOptionPane.showMessageDialog(null, e);
+    		}
+        }
+	}
+	
+	//Permet d'afficher les covoiturage auxquelles l'utilisateur connecté est inscrit (avec le statut: accepte, en attente, rejeté)--------------------------------------------------
+	public void Afficher_mes_coivoiture_inscrit(int unNumUtilisateur){
+		model_table_afficher_mes_cov_inscritpion.setColumnCount(0);
+		model_table_afficher_mes_cov_inscritpion.setRowCount(0);
+		model_table_afficher_mes_cov_inscritpion.addColumn("Num_covoiturage");
+		model_table_afficher_mes_cov_inscritpion.addColumn("CP_ville_dep");
+		model_table_afficher_mes_cov_inscritpion.addColumn("CP_ville_arr");
+		model_table_afficher_mes_cov_inscritpion.addColumn("Date");
+		model_table_afficher_mes_cov_inscritpion.addColumn("Prix");
+		model_table_afficher_mes_cov_inscritpion.addColumn("Etat");
+		table_afficher_mes_cov_inscritpion.setModel(model_table_afficher_mes_cov_inscritpion);
+		TableColumnModel tcm = table_afficher_mes_cov_inscritpion.getColumnModel();
+		tcm.getColumn(0).setPreferredWidth(5);   
+		try{
+			String sql_afficher_mescov_inscrit = ("SELECT covoiturages.num_covoiturage,cp_ville_depart,cp_ville_arriver,date,prix,etat FROM covoiturages,participant "
+					+ "WHERE covoiturages.num_covoiturage = participant.num_covoiturage AND participant.num_utilisateur = ? AND covoiturages.num_utilisateur != ?");
+			pst = conn.prepareStatement(sql_afficher_mescov_inscrit);
+			pst.setInt(1, unNumUtilisateur);
+			pst.setInt(2, unNumUtilisateur);
+			rs=pst.executeQuery();
+			while(rs.next()){
+				model_table_afficher_mes_cov_inscritpion.addRow(new Object[] {rs.getInt("covoiturages.num_covoiturage"),"D : " + rs.getInt("cp_ville_depart"), "A : " + rs.getString("cp_ville_arriver"),
+						Date_Anglais_Francais(rs.getString("date")), rs.getDouble("prix") + " EUR", rs.getString("etat")});
+	        	
+	        }
+		}
+		catch(Exception e){
+			JOptionPane.showMessageDialog(null, e);
+		}
+		table_afficher_mes_cov_inscritpion.setModel(model_table_afficher_mes_cov_inscritpion);
+	}
+	
+	//Permet de se désinscrire d'un covoiturage, puis d'ajouté +1 au nombre de place---------------------------------------------------------------------------------------------------
+	public void Se_desinscrire_covoiturage(int unNumCovoiturage, int unNumUtilisateur){
+		int option = JOptionPane.showConfirmDialog(null, "Voulez-vous vous désinscrire de ce covoiturage ?","Message de confirmation",JOptionPane.YES_NO_OPTION);
+        if(option == JOptionPane.OK_OPTION){
+        	try{
+    			String sql_desinscrire_cov = "DELETE FROM `participant` WHERE num_covoiturage = ? AND num_utilisateur = ?";
+    			pst = conn.prepareStatement(sql_desinscrire_cov);
+    			pst.setInt(1,unNumCovoiturage);
+    			pst.setInt(2, unNumUtilisateur);
+    			
+    			pst.executeUpdate();
+    			Ajouter_place_disponible(unNumCovoiturage);
+    			Afficher_mes_coivoiture_inscrit(Principale_jframe.utilisateur_conn_num);
     		}
     		catch(Exception e){
     			JOptionPane.showMessageDialog(null, e);
