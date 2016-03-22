@@ -227,6 +227,7 @@ public class Principale_jframe extends JFrame {
 	 */
 	
 	public Principale_jframe() {
+		setResizable(false);
 		
 		conn = javaconnect.ConnectDb();
 		
@@ -815,7 +816,8 @@ public class Principale_jframe extends JFrame {
 		panel_home.add(panel_gestion_vehicule);
 		panel_gestion_vehicule.setLayout(null);
 		
-		JLabel lblLeNombre = new JLabel("* Pour des raisons de flemme, le nombre de vehicule est limit\u00E9 \u00E0 3 par utilisateurs.");
+		JLabel lblLeNombre = new JLabel("(Le nombre de vehicule est limit\u00E9 \u00E0 3 par utilisateurs)");
+		lblLeNombre.setFont(new Font("Tahoma", Font.ITALIC, 11));
 		lblLeNombre.setBounds(10, 436, 465, 14);
 		panel_gestion_vehicule.add(lblLeNombre);
 		
@@ -2723,12 +2725,14 @@ public class Principale_jframe extends JFrame {
 	//On affiche les informations du conducteur (créateur de covoiturage) séléctionné---------------------------------------------
 	public void Afficher_information_conducteur(int unNumCovoiturage){
 		try{
-			String sql_recup_num_utilisateur = "SELECT num_utilisateur FROM covoiturages WHERE num_covoiturage = ?";
+			String sql_recup_num_utilisateur = "SELECT covoiturages.num_utilisateur,covoiturages.num_vehicule,marque,modele FROM covoiturages,vehicules WHERE num_covoiturage = ? AND covoiturages.num_vehicule = vehicules.num_vehicule";
 			pst = conn.prepareStatement(sql_recup_num_utilisateur);
 			pst.setInt(1, unNumCovoiturage);
 			rs=pst.executeQuery();
 			if (rs.next()){
 				int leNumUtilisateur = rs.getInt("num_utilisateur");
+				String marque = rs.getString("marque");
+				String modele = rs.getString("modele");
 				try{
 					String sql_info_utilisateur = "SELECT nom, prenom, date_naissance FROM utilisateurs WHERE num_utilisateur = ?";
 					pst = conn.prepareStatement(sql_info_utilisateur);
@@ -2744,7 +2748,7 @@ public class Principale_jframe extends JFrame {
 						LocalDate today = LocalDate.now();
 						LocalDate birthday = LocalDate.of(year, month, day);
 						Period p = Period.between(birthday, today);
-					    lblInfoConducteur.setText("Conducteur : " + rs.getString("nom") + " " + rs.getString("prenom") + " | Age : " + p.getYears());
+					    lblInfoConducteur.setText("Conducteur : " + rs.getString("nom") + " " + rs.getString("prenom") + " | Age : " + p.getYears()  + " | Vehicule : " + marque + " " + modele);
 					}
 				}
 				catch(Exception e){
@@ -2755,8 +2759,6 @@ public class Principale_jframe extends JFrame {
 		catch(Exception e){
 			JOptionPane.showMessageDialog(null, e);
 		}
-		
-		
 	}
 	
 	//On retire une place disponible quand un utilisateur s'inscri à un covoiturage--------------------------------------------------------------------------
