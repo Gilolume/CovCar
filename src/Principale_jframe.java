@@ -368,106 +368,253 @@ public class Principale_jframe extends JFrame {
 			new String[] {
 			}
 		));
-
-		table_afficher_mes_cov_cree.setBorder(new LineBorder(new Color(0, 0, 0)));
-		table_afficher_mes_cov_cree.setBounds(10, 36, 391, 166);
-		panel_mes_covoiturage.add(table_afficher_mes_cov_cree);
 		
-		JSeparator separator = new JSeparator();
-		separator.setOrientation(SwingConstants.VERTICAL);
-		separator.setForeground(Color.BLACK);
-		separator.setBackground(Color.BLACK);
-		separator.setBounds(411, 11, 1, 389);
-		panel_mes_covoiturage.add(separator);
+				//table_afficher_mes_cov_cree.setBorder(new LineBorder(new Color(0, 0, 0)));
+				//table_afficher_mes_cov_cree.setBounds(10, 36, 391, 166);
+				JScrollPane scroll_afficher_mes_cov_cree = new JScrollPane();
+				scroll_afficher_mes_cov_cree.setBounds(10, 36, 391, 166);
+				scroll_afficher_mes_cov_cree.setViewportView(table_afficher_mes_cov_cree);
+				panel_mes_covoiturage.add(scroll_afficher_mes_cov_cree);
+				
+				JSeparator separator = new JSeparator();
+				separator.setOrientation(SwingConstants.VERTICAL);
+				separator.setForeground(Color.BLACK);
+				separator.setBackground(Color.BLACK);
+				separator.setBounds(411, 11, 1, 389);
+				panel_mes_covoiturage.add(separator);
+				
+				JLabel lblNewLabel_14 = new JLabel("Covoiturage cr\u00E9\u00E9 :");
+				lblNewLabel_14.setBounds(157, 11, 142, 14);
+				panel_mes_covoiturage.add(lblNewLabel_14);
+				
+				btn_supprimer_mes_cov_cree = new JButton("Supprimer");
+				btn_supprimer_mes_cov_cree.addMouseListener(new MouseAdapter() {
+					@Override
+					public void mouseClicked(MouseEvent e) {
+						int row = table_afficher_mes_cov_cree.getSelectedRow();
+						if (row == -1){
+							JOptionPane.showMessageDialog(null, "Aucun covoiturage sélectionné !");
+						}
+						else{
+							Supprimer_un_covoiturage((Integer) table_afficher_mes_cov_cree.getModel().getValueAt(row, 0));
+						}
+					}
+				});
+				btn_supprimer_mes_cov_cree.setBounds(286, 213, 115, 23);
+				panel_mes_covoiturage.add(btn_supprimer_mes_cov_cree);
+				
+				table_afficher_mes_cov_participant = new JTable();
+				//table_afficher_mes_cov_participant.setBorder(new LineBorder(new Color(0, 0, 0)));
+				//table_afficher_mes_cov_participant.setBounds(10, 272, 391, 86);
+				JScrollPane scroll_afficher_mes_cov_participant = new JScrollPane();
+				scroll_afficher_mes_cov_participant.setBounds(10, 272, 391, 86);
+				scroll_afficher_mes_cov_participant.setViewportView(table_afficher_mes_cov_participant);
+				panel_mes_covoiturage.add(scroll_afficher_mes_cov_participant);
+				
+				JLabel lblNewLabel_15 = new JLabel("Participant \u00E0 ce covoiturage :");
+				lblNewLabel_15.setBounds(136, 247, 185, 14);
+				panel_mes_covoiturage.add(lblNewLabel_15);
+				
+				btn_accepter_participant_cov = new JButton("L'accepter");
+				btn_accepter_participant_cov.addMouseListener(new MouseAdapter() {
+					@Override
+					public void mouseClicked(MouseEvent e) {
+						int row_covoiturage = table_afficher_mes_cov_cree.getSelectedRow();
+						int row_participant = table_afficher_mes_cov_participant.getSelectedRow();
+						if (row_participant == -1){
+							JOptionPane.showMessageDialog(null, "Aucun participant sélectionné !");
+						}
+						else{
+							Accepter_participant_covoiturage((Integer) table_afficher_mes_cov_cree.getModel().getValueAt(row_covoiturage, 0), ((Integer) table_afficher_mes_cov_participant.getModel().getValueAt(row_participant, 0)));
+						}
+					}
+				});
+				btn_accepter_participant_cov.setBounds(98, 369, 103, 23);
+				panel_mes_covoiturage.add(btn_accepter_participant_cov);
+				
+				btn_rejeter_participant_cov = new JButton("Le rejeter");
+				btn_rejeter_participant_cov.addMouseListener(new MouseAdapter() {
+					@Override
+					public void mouseClicked(MouseEvent e) {
+						int row_covoiturage = table_afficher_mes_cov_cree.getSelectedRow();
+						int row_participant = table_afficher_mes_cov_participant.getSelectedRow();
+						if (row_participant == -1){
+							JOptionPane.showMessageDialog(null, "Aucun participant sélectionné !");
+						}
+						else{
+							Rejeter_participant_covoiturage((Integer) table_afficher_mes_cov_cree.getModel().getValueAt(row_covoiturage, 0), ((Integer) table_afficher_mes_cov_participant.getModel().getValueAt(row_participant, 0)));
+						}
+					}
+				});
+				btn_rejeter_participant_cov.setBounds(211, 369, 103, 23);
+				panel_mes_covoiturage.add(btn_rejeter_participant_cov);
+				
+				table_afficher_mes_cov_inscritpion = new JTable();
+				//table_afficher_mes_cov_inscritpion.setBorder(new LineBorder(new Color(0, 0, 0)));
+				//table_afficher_mes_cov_inscritpion.setBounds(422, 36, 392, 280);
+				JScrollPane scroll_afficher_mes_cov_inscritpion = new JScrollPane();
+				scroll_afficher_mes_cov_inscritpion.setBounds(422, 36, 392, 280);
+				scroll_afficher_mes_cov_inscritpion.setViewportView(table_afficher_mes_cov_inscritpion);
+				panel_mes_covoiturage.add(scroll_afficher_mes_cov_inscritpion);
+				
+				JLabel lblNewLabel_16 = new JLabel("Covoiturage auxquelles je suis inscrit :");
+				lblNewLabel_16.setBounds(514, 11, 276, 14);
+				panel_mes_covoiturage.add(lblNewLabel_16);
+				
+				btn_se_desinscrire_cov = new JButton("Se d\u00E9sinscrire");
+				btn_se_desinscrire_cov.addMouseListener(new MouseAdapter() {
+					@Override
+					public void mouseClicked(MouseEvent arg0) {
+						int row_covoiturage_inscri = table_afficher_mes_cov_inscritpion.getSelectedRow();
+						if (row_covoiturage_inscri == -1){
+							JOptionPane.showMessageDialog(null, "Aucun covoiturage sélectionné !");
+						}
+						else{
+							Se_desinscrire_covoiturage((Integer) table_afficher_mes_cov_inscritpion.getModel().getValueAt(row_covoiturage_inscri, 0),Principale_jframe.utilisateur_conn_num);
+						}
+					}
+				});
+				btn_se_desinscrire_cov.setBounds(556, 327, 128, 23);
+				panel_mes_covoiturage.add(btn_se_desinscrire_cov);
+				panel_mes_covoiturage.setVisible(false);
 		
-		JLabel lblNewLabel_14 = new JLabel("Covoiturage cr\u00E9\u00E9 :");
-		lblNewLabel_14.setBounds(157, 11, 142, 14);
-		panel_mes_covoiturage.add(lblNewLabel_14);
 		
-		btn_supprimer_mes_cov_cree = new JButton("Supprimer");
-		btn_supprimer_mes_cov_cree.addMouseListener(new MouseAdapter() {
+		panel_consulter_covoiturage = new JPanel();
+		panel_consulter_covoiturage.setBounds(0, 50, 824, 411);
+		panel_covoiturage.add(panel_consulter_covoiturage);
+		panel_consulter_covoiturage.setBorder(new LineBorder(new Color(0, 0, 0)));
+		panel_consulter_covoiturage.setLayout(null);
+		
+		button_retour_consulter_cov = new JButton("Retour");
+		button_retour_consulter_cov.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				panel_consulter_covoiturage.setVisible(false);
+				button_ajouter_covoiturage.setEnabled(true);
+				button_mes_covoiturage.setEnabled(true);
+			}
+		});
+		button_retour_consulter_cov.setBounds(725, 377, 89, 23);
+		panel_consulter_covoiturage.add(button_retour_consulter_cov);
+		
+		txt_ville_depart_consult_cov = new JTextField();
+		txt_ville_depart_consult_cov.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyReleased(KeyEvent arg0) {
+				Rechercher_dynamique_ville_cp(txt_ville_depart_consult_cov.getText()+"%",table_ville_depart_consult_cov,model_table_depart);
+			}
+		});
+		txt_ville_depart_consult_cov.setBounds(90, 8, 100, 20);
+		panel_consulter_covoiturage.add(txt_ville_depart_consult_cov);
+		txt_ville_depart_consult_cov.setColumns(10);
+		
+		txt_cp_ville_depart_consult_cov = new JTextField();
+		txt_cp_ville_depart_consult_cov.setBounds(90, 33, 100, 20);
+		panel_consulter_covoiturage.add(txt_cp_ville_depart_consult_cov);
+		txt_cp_ville_depart_consult_cov.setColumns(10);
+		
+		JLabel lblVilleDepart = new JLabel("Ville d\u00E9part");
+		lblVilleDepart.setBounds(10, 11, 70, 14);
+		panel_consulter_covoiturage.add(lblVilleDepart);
+		
+		JLabel lblCodePostal_1 = new JLabel("Code postal");
+		lblCodePostal_1.setBounds(10, 36, 74, 14);
+		panel_consulter_covoiturage.add(lblCodePostal_1);
+		
+		table_ville_depart_consult_cov = new JTable();
+		table_ville_depart_consult_cov.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent evt) {
+				if (evt.getClickCount() == 2 && SwingUtilities.isLeftMouseButton(evt)){
+					Double_click_ville(table_ville_depart_consult_cov, txt_ville_depart_consult_cov, txt_cp_ville_depart_consult_cov);
+				}
+			}
+		});
+		table_ville_depart_consult_cov.setBorder(new LineBorder(new Color(0, 0, 0)));
+		table_ville_depart_consult_cov.setModel(model_table_depart);
+		table_ville_depart_consult_cov.setBounds(200, 11, 200, 100);
+		panel_consulter_covoiturage.add(table_ville_depart_consult_cov);
+		
+		table_ville_arriver_consult_cov = new JTable();
+		table_ville_arriver_consult_cov.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent evt) {
+				if (evt.getClickCount() == 2 && SwingUtilities.isLeftMouseButton(evt)){
+					Double_click_ville(table_ville_arriver_consult_cov, txt_ville_arriver_consult_cov, txt_cp_ville_arriver_consult_cov);
+				}
+			}
+		});
+		table_ville_arriver_consult_cov.setBorder(new LineBorder(new Color(0, 0, 0)));
+		table_ville_arriver_consult_cov.setModel(model_table_arriver);
+		table_ville_arriver_consult_cov.setBounds(600, 14, 200, 100);
+		panel_consulter_covoiturage.add(table_ville_arriver_consult_cov);
+		
+		txt_cp_ville_arriver_consult_cov = new JTextField();
+		txt_cp_ville_arriver_consult_cov.setColumns(10);
+		txt_cp_ville_arriver_consult_cov.setBounds(490, 36, 100, 20);
+		panel_consulter_covoiturage.add(txt_cp_ville_arriver_consult_cov);
+		
+		txt_ville_arriver_consult_cov = new JTextField();
+		txt_ville_arriver_consult_cov.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyReleased(KeyEvent e) {
+				Rechercher_dynamique_ville_cp(txt_ville_arriver_consult_cov.getText()+"%",table_ville_arriver_consult_cov,model_table_arriver);
+			}
+		});
+		txt_ville_arriver_consult_cov.setColumns(10);
+		txt_ville_arriver_consult_cov.setBounds(490, 11, 100, 20);
+		panel_consulter_covoiturage.add(txt_ville_arriver_consult_cov);
+		
+		JLabel label = new JLabel("Code postal");
+		label.setBounds(410, 39, 74, 14);
+		panel_consulter_covoiturage.add(label);
+		
+		JLabel lblVilleArrive = new JLabel("Ville arriv\u00E9e");
+		lblVilleArrive.setBounds(410, 14, 70, 14);
+		panel_consulter_covoiturage.add(lblVilleArrive);
+		
+		JButton btnChercherUnCovoiturage = new JButton("Chercher un covoiturage");
+		btnChercherUnCovoiturage.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				int row = table_afficher_mes_cov_cree.getSelectedRow();
-				if (row == -1){
-					JOptionPane.showMessageDialog(null, "Aucun covoiturage sélectionné !");
-				}
-				else{
-					Supprimer_un_covoiturage((Integer) table_afficher_mes_cov_cree.getModel().getValueAt(row, 0));
-				}
+				Rechercher_covoiturage();
 			}
 		});
-		btn_supprimer_mes_cov_cree.setBounds(286, 213, 115, 23);
-		panel_mes_covoiturage.add(btn_supprimer_mes_cov_cree);
+		btnChercherUnCovoiturage.setBounds(327, 122, 190, 23);
+		panel_consulter_covoiturage.add(btnChercherUnCovoiturage);
 		
-		table_afficher_mes_cov_participant = new JTable();
-		table_afficher_mes_cov_participant.setBorder(new LineBorder(new Color(0, 0, 0)));
-		table_afficher_mes_cov_participant.setBounds(10, 272, 391, 86);
-		panel_mes_covoiturage.add(table_afficher_mes_cov_participant);
-		
-		JLabel lblNewLabel_15 = new JLabel("Participant \u00E0 ce covoiturage :");
-		lblNewLabel_15.setBounds(136, 247, 185, 14);
-		panel_mes_covoiturage.add(lblNewLabel_15);
-		
-		btn_accepter_participant_cov = new JButton("L'accepter");
-		btn_accepter_participant_cov.addMouseListener(new MouseAdapter() {
+		table_afficher_consult_cov = new JTable();
+		table_afficher_consult_cov.addMouseListener(new MouseAdapter() {
 			@Override
-			public void mouseClicked(MouseEvent e) {
-				int row_covoiturage = table_afficher_mes_cov_cree.getSelectedRow();
-				int row_participant = table_afficher_mes_cov_participant.getSelectedRow();
-				if (row_participant == -1){
-					JOptionPane.showMessageDialog(null, "Aucun participant sélectionné !");
+			public void mouseClicked(MouseEvent evt) {
+				int row = table_afficher_consult_cov.getSelectedRow();
+				if (evt.getClickCount() == 2 && SwingUtilities.isLeftMouseButton(evt)){
+					Inscription_covoiturage((Integer) table_afficher_consult_cov.getModel().getValueAt(row, 0), Principale_jframe.utilisateur_conn_num);
 				}
-				else{
-					Accepter_participant_covoiturage((Integer) table_afficher_mes_cov_cree.getModel().getValueAt(row_covoiturage, 0), ((Integer) table_afficher_mes_cov_participant.getModel().getValueAt(row_participant, 0)));
-				}
-			}
-		});
-		btn_accepter_participant_cov.setBounds(98, 369, 103, 23);
-		panel_mes_covoiturage.add(btn_accepter_participant_cov);
-		
-		btn_rejeter_participant_cov = new JButton("Le rejeter");
-		btn_rejeter_participant_cov.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				int row_covoiturage = table_afficher_mes_cov_cree.getSelectedRow();
-				int row_participant = table_afficher_mes_cov_participant.getSelectedRow();
-				if (row_participant == -1){
-					JOptionPane.showMessageDialog(null, "Aucun participant sélectionné !");
-				}
-				else{
-					Rejeter_participant_covoiturage((Integer) table_afficher_mes_cov_cree.getModel().getValueAt(row_covoiturage, 0), ((Integer) table_afficher_mes_cov_participant.getModel().getValueAt(row_participant, 0)));
+				else if (SwingUtilities.isLeftMouseButton(evt)){
+					//Afficher les information du conducteur sur le covoiturage sélectionné
+					Afficher_information_conducteur((Integer) table_afficher_consult_cov.getModel().getValueAt(row, 0));
 				}
 			}
 		});
-		btn_rejeter_participant_cov.setBounds(211, 369, 103, 23);
-		panel_mes_covoiturage.add(btn_rejeter_participant_cov);
+		//table_afficher_consult_cov.setBorder(new LineBorder(new Color(0, 0, 0)));
+		table_afficher_consult_cov.setModel(model_table_afficher_cov);
+		//table_afficher_consult_cov.setBounds(10, 156, 804, 155);
+		JScrollPane scroll_afficher_consult_cov = new JScrollPane();
+		scroll_afficher_consult_cov.setBounds(10, 156, 804, 155);
+		scroll_afficher_consult_cov.setViewportView(table_afficher_consult_cov);
+		panel_consulter_covoiturage.add(scroll_afficher_consult_cov);
 		
-		table_afficher_mes_cov_inscritpion = new JTable();
-		table_afficher_mes_cov_inscritpion.setBorder(new LineBorder(new Color(0, 0, 0)));
-		table_afficher_mes_cov_inscritpion.setBounds(422, 36, 392, 280);
-		panel_mes_covoiturage.add(table_afficher_mes_cov_inscritpion);
+		JLabel lblNewLabel_13 = new JLabel("(Double clic pour s'inscrire \u00E0 un covoiturage)");
+		lblNewLabel_13.setFont(new Font("Tahoma", Font.ITALIC, 11));
+		lblNewLabel_13.setBounds(10, 322, 270, 14);
+		panel_consulter_covoiturage.add(lblNewLabel_13);
 		
-		JLabel lblNewLabel_16 = new JLabel("Covoiturage auxquelles je suis inscrit :");
-		lblNewLabel_16.setBounds(514, 11, 276, 14);
-		panel_mes_covoiturage.add(lblNewLabel_16);
-		
-		btn_se_desinscrire_cov = new JButton("Se d\u00E9sinscrire");
-		btn_se_desinscrire_cov.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent arg0) {
-				int row_covoiturage_inscri = table_afficher_mes_cov_inscritpion.getSelectedRow();
-				if (row_covoiturage_inscri == -1){
-					JOptionPane.showMessageDialog(null, "Aucun covoiturage sélectionné !");
-				}
-				else{
-					Se_desinscrire_covoiturage((Integer) table_afficher_mes_cov_inscritpion.getModel().getValueAt(row_covoiturage_inscri, 0),Principale_jframe.utilisateur_conn_num);
-				}
-			}
-		});
-		btn_se_desinscrire_cov.setBounds(556, 327, 128, 23);
-		panel_mes_covoiturage.add(btn_se_desinscrire_cov);
-		panel_mes_covoiturage.setVisible(false);
+		lblInfoConducteur = new JLabel("");
+		lblInfoConducteur.setForeground(Color.BLUE);
+		lblInfoConducteur.setBackground(Color.WHITE);
+		lblInfoConducteur.setBounds(327, 322, 487, 14);
+		panel_consulter_covoiturage.add(lblInfoConducteur);
+		panel_consulter_covoiturage.setVisible(false);
 		
 		panel_ajouter_covoiturage = new JPanel();
 		panel_ajouter_covoiturage.setBorder(new LineBorder(new Color(0, 0, 0)));
@@ -621,141 +768,6 @@ public class Principale_jframe extends JFrame {
 		panel_ajouter_covoiturage.add(txt_ville_depart_ajouter_cov);
 		txt_ville_depart_ajouter_cov.setColumns(10);
 		panel_ajouter_covoiturage.setVisible(false);
-		
-		
-		panel_consulter_covoiturage = new JPanel();
-		panel_consulter_covoiturage.setBounds(0, 50, 824, 411);
-		panel_covoiturage.add(panel_consulter_covoiturage);
-		panel_consulter_covoiturage.setBorder(new LineBorder(new Color(0, 0, 0)));
-		panel_consulter_covoiturage.setLayout(null);
-		
-		button_retour_consulter_cov = new JButton("Retour");
-		button_retour_consulter_cov.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				panel_consulter_covoiturage.setVisible(false);
-				button_ajouter_covoiturage.setEnabled(true);
-				button_mes_covoiturage.setEnabled(true);
-			}
-		});
-		button_retour_consulter_cov.setBounds(725, 377, 89, 23);
-		panel_consulter_covoiturage.add(button_retour_consulter_cov);
-		
-		txt_ville_depart_consult_cov = new JTextField();
-		txt_ville_depart_consult_cov.addKeyListener(new KeyAdapter() {
-			@Override
-			public void keyReleased(KeyEvent arg0) {
-				Rechercher_dynamique_ville_cp(txt_ville_depart_consult_cov.getText()+"%",table_ville_depart_consult_cov,model_table_depart);
-			}
-		});
-		txt_ville_depart_consult_cov.setBounds(90, 8, 100, 20);
-		panel_consulter_covoiturage.add(txt_ville_depart_consult_cov);
-		txt_ville_depart_consult_cov.setColumns(10);
-		
-		txt_cp_ville_depart_consult_cov = new JTextField();
-		txt_cp_ville_depart_consult_cov.setBounds(90, 33, 100, 20);
-		panel_consulter_covoiturage.add(txt_cp_ville_depart_consult_cov);
-		txt_cp_ville_depart_consult_cov.setColumns(10);
-		
-		JLabel lblVilleDepart = new JLabel("Ville d\u00E9part");
-		lblVilleDepart.setBounds(10, 11, 70, 14);
-		panel_consulter_covoiturage.add(lblVilleDepart);
-		
-		JLabel lblCodePostal_1 = new JLabel("Code postal");
-		lblCodePostal_1.setBounds(10, 36, 74, 14);
-		panel_consulter_covoiturage.add(lblCodePostal_1);
-		
-		table_ville_depart_consult_cov = new JTable();
-		table_ville_depart_consult_cov.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent evt) {
-				if (evt.getClickCount() == 2 && SwingUtilities.isLeftMouseButton(evt)){
-					Double_click_ville(table_ville_depart_consult_cov, txt_ville_depart_consult_cov, txt_cp_ville_depart_consult_cov);
-				}
-			}
-		});
-		table_ville_depart_consult_cov.setBorder(new LineBorder(new Color(0, 0, 0)));
-		table_ville_depart_consult_cov.setModel(model_table_depart);
-		table_ville_depart_consult_cov.setBounds(200, 11, 200, 100);
-		panel_consulter_covoiturage.add(table_ville_depart_consult_cov);
-		
-		table_ville_arriver_consult_cov = new JTable();
-		table_ville_arriver_consult_cov.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent evt) {
-				if (evt.getClickCount() == 2 && SwingUtilities.isLeftMouseButton(evt)){
-					Double_click_ville(table_ville_arriver_consult_cov, txt_ville_arriver_consult_cov, txt_cp_ville_arriver_consult_cov);
-				}
-			}
-		});
-		table_ville_arriver_consult_cov.setBorder(new LineBorder(new Color(0, 0, 0)));
-		table_ville_arriver_consult_cov.setModel(model_table_arriver);
-		table_ville_arriver_consult_cov.setBounds(600, 14, 200, 100);
-		panel_consulter_covoiturage.add(table_ville_arriver_consult_cov);
-		
-		txt_cp_ville_arriver_consult_cov = new JTextField();
-		txt_cp_ville_arriver_consult_cov.setColumns(10);
-		txt_cp_ville_arriver_consult_cov.setBounds(490, 36, 100, 20);
-		panel_consulter_covoiturage.add(txt_cp_ville_arriver_consult_cov);
-		
-		txt_ville_arriver_consult_cov = new JTextField();
-		txt_ville_arriver_consult_cov.addKeyListener(new KeyAdapter() {
-			@Override
-			public void keyReleased(KeyEvent e) {
-				Rechercher_dynamique_ville_cp(txt_ville_arriver_consult_cov.getText()+"%",table_ville_arriver_consult_cov,model_table_arriver);
-			}
-		});
-		txt_ville_arriver_consult_cov.setColumns(10);
-		txt_ville_arriver_consult_cov.setBounds(490, 11, 100, 20);
-		panel_consulter_covoiturage.add(txt_ville_arriver_consult_cov);
-		
-		JLabel label = new JLabel("Code postal");
-		label.setBounds(410, 39, 74, 14);
-		panel_consulter_covoiturage.add(label);
-		
-		JLabel lblVilleArrive = new JLabel("Ville arriv\u00E9e");
-		lblVilleArrive.setBounds(410, 14, 70, 14);
-		panel_consulter_covoiturage.add(lblVilleArrive);
-		
-		JButton btnChercherUnCovoiturage = new JButton("Chercher un covoiturage");
-		btnChercherUnCovoiturage.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				Rechercher_covoiturage();
-			}
-		});
-		btnChercherUnCovoiturage.setBounds(327, 122, 190, 23);
-		panel_consulter_covoiturage.add(btnChercherUnCovoiturage);
-		
-		table_afficher_consult_cov = new JTable();
-		table_afficher_consult_cov.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent evt) {
-				int row = table_afficher_consult_cov.getSelectedRow();
-				if (evt.getClickCount() == 2 && SwingUtilities.isLeftMouseButton(evt)){
-					Inscription_covoiturage((Integer) table_afficher_consult_cov.getModel().getValueAt(row, 0), Principale_jframe.utilisateur_conn_num);
-				}
-				else if (SwingUtilities.isLeftMouseButton(evt)){
-					//Afficher les information du conducteur sur le covoiturage sélectionné
-					Afficher_information_conducteur((Integer) table_afficher_consult_cov.getModel().getValueAt(row, 0));
-				}
-			}
-		});
-		table_afficher_consult_cov.setBorder(new LineBorder(new Color(0, 0, 0)));
-		table_afficher_consult_cov.setModel(model_table_afficher_cov);
-		table_afficher_consult_cov.setBounds(10, 156, 804, 155);
-		panel_consulter_covoiturage.add(table_afficher_consult_cov);
-		
-		JLabel lblNewLabel_13 = new JLabel("(Double clic pour s'inscrire \u00E0 un covoiturage)");
-		lblNewLabel_13.setFont(new Font("Tahoma", Font.ITALIC, 11));
-		lblNewLabel_13.setBounds(10, 322, 270, 14);
-		panel_consulter_covoiturage.add(lblNewLabel_13);
-		
-		lblInfoConducteur = new JLabel("");
-		lblInfoConducteur.setForeground(Color.BLUE);
-		lblInfoConducteur.setBackground(Color.WHITE);
-		lblInfoConducteur.setBounds(327, 322, 487, 14);
-		panel_consulter_covoiturage.add(lblInfoConducteur);
-		panel_consulter_covoiturage.setVisible(false);
 		/*table_ville_depart_ajouter_cov.setModel(new DefaultTableModel(
 			new Object[][] {
 			},
@@ -2625,7 +2637,7 @@ public class Principale_jframe extends JFrame {
 	public void Rechercher_covoiturage(){
 		model_table_afficher_cov.setColumnCount(0);
 		model_table_afficher_cov.setRowCount(0);
-		model_table_afficher_cov.addColumn("N° cov");
+		model_table_afficher_cov.addColumn("ID");
 		model_table_afficher_cov.addColumn("CP ville départ");
 		model_table_afficher_cov.addColumn("CP ville arrivée");
 		model_table_afficher_cov.addColumn("Date");
@@ -2633,6 +2645,9 @@ public class Principale_jframe extends JFrame {
 		model_table_afficher_cov.addColumn("Nombre places");
 		model_table_afficher_cov.addColumn("Prix");
 		table_afficher_consult_cov.setModel(model_table_afficher_cov);
+		TableColumnModel tcm = table_afficher_consult_cov.getColumnModel();
+		tcm.getColumn(0).setPreferredWidth(5);   
+		
 		try{
 			String sql_recherche_covoiturage = ("SELECT * FROM covoiturages WHERE cp_ville_depart = ? AND cp_ville_arriver = ? AND nb_place > 0");
 			pst = conn.prepareStatement(sql_recherche_covoiturage);
@@ -2644,8 +2659,8 @@ public class Principale_jframe extends JFrame {
 			boolean result = false;
 			while(rs.next()){
 				result = true;
-	        	model_table_afficher_cov.addRow(new Object[] {rs.getInt("num_covoiturage"), "Départ : " + rs.getString("cp_ville_depart"), "Arrivé : " + rs.getString("cp_ville_arriver"),
-	        			"Date : " + Date_Anglais_Francais(rs.getString("date")), rs.getFloat("distance") + " km", rs.getInt("nb_place") + " place(s)", rs.getFloat("prix") + " EUR"});
+	        	model_table_afficher_cov.addRow(new Object[] {rs.getInt("num_covoiturage"), rs.getString("cp_ville_depart"), rs.getString("cp_ville_arriver"),
+	        			Date_Anglais_Francais(rs.getString("date")), rs.getFloat("distance") + " km", rs.getInt("nb_place") + " place(s)", rs.getFloat("prix") + " EUR"});
 	        	
 	        }
 			if (result == false){
@@ -2792,7 +2807,7 @@ public class Principale_jframe extends JFrame {
 	public void Afficher_mes_covoiturage_cree(int unNumUtilisateur){
 		model_table_afficher_mes_cov_cree.setColumnCount(0);
 		model_table_afficher_mes_cov_cree.setRowCount(0);
-		model_table_afficher_mes_cov_cree.addColumn("N° cov");
+		model_table_afficher_mes_cov_cree.addColumn("ID");
 		model_table_afficher_mes_cov_cree.addColumn("CP ville départ");
 		model_table_afficher_mes_cov_cree.addColumn("CP ville arrivée");
 		model_table_afficher_mes_cov_cree.addColumn("Date");
@@ -2807,7 +2822,7 @@ public class Principale_jframe extends JFrame {
 			pst.setInt(1, unNumUtilisateur);
 			rs=pst.executeQuery();
 			while(rs.next()){
-				model_table_afficher_mes_cov_cree.addRow(new Object[] {rs.getInt("num_covoiturage"), "D : " + rs.getString("cp_ville_depart"), "A : " + rs.getString("cp_ville_arriver"), 
+				model_table_afficher_mes_cov_cree.addRow(new Object[] {rs.getInt("num_covoiturage"), rs.getString("cp_ville_depart"), rs.getString("cp_ville_arriver"), 
 						Date_Anglais_Francais(rs.getString("date")), rs.getInt("nb_place") + " place(s)"});
 	        	
 	        }
@@ -2851,7 +2866,7 @@ public class Principale_jframe extends JFrame {
 	public void Afficher_participant_covoiturage(int unNumCovoiturage, int unNumUtilisateur){
 		model_table_afficher_mes_cov_participant.setColumnCount(0);
 		model_table_afficher_mes_cov_participant.setRowCount(0);
-		model_table_afficher_mes_cov_participant.addColumn("Num utilisateur");
+		model_table_afficher_mes_cov_participant.addColumn("ID");
 		model_table_afficher_mes_cov_participant.addColumn("Nom");
 		model_table_afficher_mes_cov_participant.addColumn("Prenom");
 		model_table_afficher_mes_cov_participant.addColumn("Etat");
@@ -2916,15 +2931,15 @@ public class Principale_jframe extends JFrame {
 	public void Afficher_mes_coivoiture_inscrit(int unNumUtilisateur){
 		model_table_afficher_mes_cov_inscritpion.setColumnCount(0);
 		model_table_afficher_mes_cov_inscritpion.setRowCount(0);
-		model_table_afficher_mes_cov_inscritpion.addColumn("Num_covoiturage");
-		model_table_afficher_mes_cov_inscritpion.addColumn("CP_ville_dep");
-		model_table_afficher_mes_cov_inscritpion.addColumn("CP_ville_arr");
+		model_table_afficher_mes_cov_inscritpion.addColumn("ID");
+		model_table_afficher_mes_cov_inscritpion.addColumn("CP départ");
+		model_table_afficher_mes_cov_inscritpion.addColumn("CP arrivé");
 		model_table_afficher_mes_cov_inscritpion.addColumn("Date");
 		model_table_afficher_mes_cov_inscritpion.addColumn("Prix");
 		model_table_afficher_mes_cov_inscritpion.addColumn("Etat");
 		table_afficher_mes_cov_inscritpion.setModel(model_table_afficher_mes_cov_inscritpion);
 		TableColumnModel tcm = table_afficher_mes_cov_inscritpion.getColumnModel();
-		tcm.getColumn(0).setPreferredWidth(5);   
+		tcm.getColumn(0).setPreferredWidth(30);   
 		try{
 			String sql_afficher_mescov_inscrit = ("SELECT covoiturages.num_covoiturage,cp_ville_depart,cp_ville_arriver,date,prix,etat FROM covoiturages,participant "
 					+ "WHERE covoiturages.num_covoiturage = participant.num_covoiturage AND participant.num_utilisateur = ? AND covoiturages.num_utilisateur != ?");
@@ -2933,7 +2948,7 @@ public class Principale_jframe extends JFrame {
 			pst.setInt(2, unNumUtilisateur);
 			rs=pst.executeQuery();
 			while(rs.next()){
-				model_table_afficher_mes_cov_inscritpion.addRow(new Object[] {rs.getInt("covoiturages.num_covoiturage"),"D : " + rs.getInt("cp_ville_depart"), "A : " + rs.getString("cp_ville_arriver"),
+				model_table_afficher_mes_cov_inscritpion.addRow(new Object[] {rs.getInt("covoiturages.num_covoiturage"),rs.getInt("cp_ville_depart"),rs.getString("cp_ville_arriver"),
 						Date_Anglais_Francais(rs.getString("date")), rs.getDouble("prix") + " EUR", rs.getString("etat")});
 	        	
 	        }
