@@ -2,6 +2,14 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
@@ -44,8 +52,11 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
 
 import com.mysql.jdbc.PingTarget;
+import com.sun.mail.smtp.SMTPTransport;
 
 import java.util.Calendar;
+import java.util.Properties;
+import java.util.ResourceBundle;
 import java.util.Vector;
 import java.awt.event.KeyAdapter;
 import java.awt.event.InputMethodListener;
@@ -244,14 +255,14 @@ public class Principale_jframe extends JFrame {
 		contentPane.add(panel_home);
 		panel_home.setLayout(null);
 		
-		JLabel lblHome = new JLabel("Accueil");
+		JLabel lblHome = new JLabel("CovCar");
 		lblHome.setHorizontalAlignment(SwingConstants.CENTER);
 		lblHome.setForeground(Color.DARK_GRAY);
 		lblHome.setFont(new Font("Tahoma", Font.BOLD, 24));
-		lblHome.setBounds(354, 26, 136, 29);
+		lblHome.setBounds(70, 26, 710, 29);
 		panel_home.add(lblHome);
 		
-		button_modifier_compte_home = new JButton("Modifier compte");
+		button_modifier_compte_home = new JButton("Mon Compte");
 		button_modifier_compte_home.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				panel_mod_compte.setVisible(true);
@@ -299,7 +310,7 @@ public class Principale_jframe extends JFrame {
 		button_covoiturage_home.setBounds(70, 66, 170, 23);
 		panel_home.add(button_covoiturage_home);
 		
-		button_se_deconnecter_home = new JButton("Se deconnecter");
+		button_se_deconnecter_home = new JButton("Se déconnecter");
 		button_se_deconnecter_home.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				SeDeconnecter();
@@ -457,7 +468,7 @@ public class Principale_jframe extends JFrame {
 				scroll_afficher_mes_cov_inscritpion.setViewportView(table_afficher_mes_cov_inscritpion);
 				panel_mes_covoiturage.add(scroll_afficher_mes_cov_inscritpion);
 				
-				JLabel lblNewLabel_16 = new JLabel("Covoiturage auxquelles je suis inscrit :");
+				JLabel lblNewLabel_16 = new JLabel("Covoiturage auxquels je suis inscrit :");
 				lblNewLabel_16.setBounds(514, 11, 276, 14);
 				panel_mes_covoiturage.add(lblNewLabel_16);
 				
@@ -783,7 +794,7 @@ public class Principale_jframe extends JFrame {
 		button_retour_covoiturage.setBounds(725, 427, 89, 23);
 		panel_covoiturage.add(button_retour_covoiturage);
 		
-		button_consulter_covoiturage = new JButton("Consulter covoiturage");
+		button_consulter_covoiturage = new JButton("Consulter");
 		button_consulter_covoiturage.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				panel_consulter_covoiturage.setVisible(true);
@@ -794,7 +805,7 @@ public class Principale_jframe extends JFrame {
 		button_consulter_covoiturage.setBounds(103, 11, 199, 23);
 		panel_covoiturage.add(button_consulter_covoiturage);
 		
-		button_ajouter_covoiturage = new JButton("Ajouter covoiturage");
+		button_ajouter_covoiturage = new JButton("Ajouter");
 		button_ajouter_covoiturage.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				panel_ajouter_covoiturage.setVisible(true);
