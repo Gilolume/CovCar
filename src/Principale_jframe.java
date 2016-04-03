@@ -839,7 +839,7 @@ public class Principale_jframe extends JFrame {
 		panel_home.add(panel_gestion_vehicule);
 		panel_gestion_vehicule.setLayout(null);
 		
-		JLabel lblLeNombre = new JLabel("(Le nombre de vehicule est limit\u00E9 \u00E0 3 par utilisateurs)");
+		JLabel lblLeNombre = new JLabel("(Le nombre de véhicules est limit\u00E9 \u00E0 3 par utilisateur)");
 		lblLeNombre.setFont(new Font("Tahoma", Font.ITALIC, 11));
 		lblLeNombre.setBounds(10, 436, 465, 14);
 		panel_gestion_vehicule.add(lblLeNombre);
