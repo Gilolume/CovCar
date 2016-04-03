@@ -70,7 +70,7 @@ public class Principale_jframe extends JFrame {
 
 	private JPanel contentPane;
 	private JTextField txt_pseudo;
-	private JTextField pass_mdp;
+	private JPasswordField pass_mdp;
 	private JLabel label_pseudo;
 	private JLabel label_mdp;
 	private JButton button_connexion;
@@ -1266,7 +1266,7 @@ public class Principale_jframe extends JFrame {
 		label_mdp.setBounds(390, 242, 99, 14);
 		panel_connexion.add(label_mdp);
 		
-		pass_mdp = new JTextField();
+		pass_mdp = new JPasswordField();
 		pass_mdp.setBounds(342, 267, 160, 20);
 		panel_connexion.add(pass_mdp);
 		
@@ -1438,7 +1438,11 @@ public class Principale_jframe extends JFrame {
         try{
             pst = conn.prepareStatement(sql);
             pst.setString(1,txt_pseudo.getText());
-            pst.setString(2,pass_mdp.getText());
+            String mdp = "";
+            for (char caractere : pass_mdp.getPassword()){
+            	mdp = mdp + caractere;
+            }
+            pst.setString(2,mdp);
             
             rs=pst.executeQuery();
             if (rs.next()){
