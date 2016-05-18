@@ -21,7 +21,8 @@ public class javaconnect {
     //lecture du fichier texte	
     public static void Param_connect_init(){
         try{
-            String fichier = new File("src/Param_connect.txt").getAbsolutePath();
+            String fichier = new File("res/Param_connect.txt").getPath();
+            //System.out.println(fichier);
             InputStream ips=new FileInputStream(fichier); 
             InputStreamReader ipsr=new InputStreamReader(ips);
             BufferedReader br=new BufferedReader(ipsr);
@@ -48,7 +49,7 @@ public class javaconnect {
     }
     public static Connection ConnectDb(){
         try{
-            Param_connect_init();
+            //Param_connect_init();
             Class.forName("com.mysql.jdbc.Driver");
             Connection conn = DriverManager.getConnection(chemin_serveur,admin_serveur,mdp_admin_serveur);
             return conn;

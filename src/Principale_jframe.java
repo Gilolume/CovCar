@@ -818,7 +818,7 @@ public class Principale_jframe extends JFrame {
 		panel_covoiturage.add(button_ajouter_covoiturage);
 		button_ajouter_covoiturage.setEnabled(false);
 		
-		button_mes_covoiturage = new JButton("Mes covoiturage");
+		button_mes_covoiturage = new JButton("Mes covoiturage(s)");
 		button_mes_covoiturage.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				panel_mes_covoiturage.setVisible(true);
@@ -2947,8 +2947,8 @@ public class Principale_jframe extends JFrame {
 		model_table_afficher_mes_cov_inscritpion.setColumnCount(0);
 		model_table_afficher_mes_cov_inscritpion.setRowCount(0);
 		model_table_afficher_mes_cov_inscritpion.addColumn("ID");
-		model_table_afficher_mes_cov_inscritpion.addColumn("CP départ");
-		model_table_afficher_mes_cov_inscritpion.addColumn("CP arrivé");
+		model_table_afficher_mes_cov_inscritpion.addColumn("De");
+		model_table_afficher_mes_cov_inscritpion.addColumn("À");
 		model_table_afficher_mes_cov_inscritpion.addColumn("Date");
 		model_table_afficher_mes_cov_inscritpion.addColumn("Prix");
 		model_table_afficher_mes_cov_inscritpion.addColumn("Etat");
@@ -2963,6 +2963,9 @@ public class Principale_jframe extends JFrame {
 			pst.setInt(2, unNumUtilisateur);
 			rs=pst.executeQuery();
 			while(rs.next()){
+				String cp_dep = "";
+				String cp_arr = "";
+				
 				model_table_afficher_mes_cov_inscritpion.addRow(new Object[] {rs.getInt("covoiturages.num_covoiturage"),rs.getInt("cp_ville_depart"),rs.getString("cp_ville_arriver"),
 						Date_Anglais_Francais(rs.getString("date")), rs.getDouble("prix") + " EUR", rs.getString("etat")});
 	        	
